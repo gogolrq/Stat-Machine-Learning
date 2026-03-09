@@ -1,0 +1,11 @@
+1. Residual networks (ResNet)
+2. Variational autoencoder (VAE) 
+3. Sentiment analysis
+4. Multi-armed bandit 
+5. Latent Dirichlet Allocation
+6. Adversarial Robustness Training
+7. Transformer
+8. Difference in difference (DID)
+9. Synthetic Control Method (SCM)
+10. Regression Discontinuity Design (RDD)    
+11. Local Average Treatment Effect (LATE)

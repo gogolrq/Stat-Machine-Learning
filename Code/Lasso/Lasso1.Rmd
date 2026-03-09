@@ -1,0 +1,48 @@
+---
+title: "Lasso-1"
+author: "Ruiqi Liu"
+date: "2026-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Model
+Model:
+$$y=\sum_{i=1}^{10} \beta_j x_i+\epsilon.$$
+Here $\beta_1=\ldots=\beta_3=3, \beta_4=\ldots=\beta_7=-2, \beta_9=\ldots=\beta_{10}=4$. We consider the penalty:
+$$\lambda\sum_{j=1}^{9}|\beta_{j+1}-\beta_j|$$
+
+```{r}
+rm(list=ls())
+library(CVXR)
+set.seed(1)
+n=1000
+p=10
+x=runif(n*p,0,5)
+x=matrix(x,ncol = p)
+b=c(3,3,3,-2,-2,-2,-2,4,4,4)*1
+y=x%*%b+rnorm(n,sd=2)
+
+beta=Variable(p)
+loss=sum((y-x%*%beta)^2)/n
+penalty=0
+for (i in 2:p){
+    penalty=penalty+abs(beta[i]-beta[i-1])
+}
+
+
+
+lambda=1
+obj=loss+lambda*penalty
+prob=Problem(Minimize(obj))
+result=solve(prob)
+result$getValue(beta)
+
+lmod_ols=lm(y~x-1)
+lmod_ols$coef
+```
+
+

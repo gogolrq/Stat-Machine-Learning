@@ -1,0 +1,44 @@
+---
+title: "Lasso2"
+author: "Ruiqi Liu"
+date: "2026-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Compare glmnet and CVXR
+Model:
+$$y=-2+\sum_{i=1}^{20} \beta_j x_i+\epsilon.$$
+Here $\beta_1=\ldots=\beta_5=1, \beta_6=\ldots=\beta_{20}=0$.
+
+```{r}
+rm(list=ls())
+library(CVXR)
+library(glmnet)
+set.seed(1)
+n=100 
+p=20 
+thresh=1e-22
+lambda=0.000001
+x=matrix(runif(n * p, 0, 5), n, p) 
+xx=cbind(1, x)
+b=c(-2,rep(1,5), rep(0, p-5))*3
+y=xx%*%b + rnorm(n)
+#y=rnorm(n)
+fit1=glmnet(x,y, lambda = lambda, thresh = thresh, standardize=FALSE)
+coef1=coef(fit1)
+
+beta=Variable(p + 1)
+#obj=sum_squares(y - xx %*% beta) / (2 * n) + lambda * p_norm(beta[-1], 1)
+loss=sum((y - xx %*% beta)^2)/(2*n)
+penalty=lambda*sum(abs(beta[-1]))
+obj=loss+penalty
+prob=Problem(Minimize(obj))
+result=solve(prob, FEASTOL = thresh, RELTOL = thresh, ABSTOL = thresh, verbose = TRUE)
+coef2=result$getValue(beta)
+v=cbind(as.vector(coef1),coef2)
+print(round(v,digits = 7))
+```
